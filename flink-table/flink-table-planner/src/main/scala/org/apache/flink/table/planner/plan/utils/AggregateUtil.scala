@@ -27,7 +27,7 @@ import org.apache.flink.table.planner.JLong
 import org.apache.flink.table.planner.calcite.{FlinkTypeFactory, FlinkTypeSystem}
 import org.apache.flink.table.planner.delegation.PlannerBase
 import org.apache.flink.table.planner.expressions._
-import org.apache.flink.table.planner.functions.aggfunctions.{CountAggFunction, DeclarativeAggregateFunction, Sum0AggFunction}
+import org.apache.flink.table.planner.functions.aggfunctions.{AvgAggFunction, CountAggFunction, DeclarativeAggregateFunction, Sum0AggFunction}
 import org.apache.flink.table.planner.functions.aggfunctions.AvgAggFunction.{ByteAvgAggFunction, DoubleAvgAggFunction, FloatAvgAggFunction, IntAvgAggFunction, LongAvgAggFunction, ShortAvgAggFunction}
 import org.apache.flink.table.planner.functions.aggfunctions.Sum0AggFunction.{ByteSum0AggFunction, DoubleSum0AggFunction, FloatSum0AggFunction, IntSum0AggFunction, LongSum0AggFunction, ShortSum0AggFunction}
 import org.apache.flink.table.planner.functions.bridging.BridgingSqlAggFunction
@@ -53,7 +53,6 @@ import org.apache.flink.table.types.logical.utils.LogicalTypeChecks
 import org.apache.flink.table.types.logical.utils.LogicalTypeChecks.hasRoot
 import org.apache.flink.table.types.logical.{LogicalTypeRoot, _}
 import org.apache.flink.table.types.utils.DataTypeUtils
-
 import org.apache.calcite.rel.`type`._
 import org.apache.calcite.rel.core.Aggregate.AggCallBinding
 import org.apache.calcite.rel.core.{Aggregate, AggregateCall}
@@ -65,7 +64,6 @@ import org.apache.calcite.tools.RelBuilder
 
 import java.time.Duration
 import java.util
-
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -281,8 +279,8 @@ object AggregateUtil extends Enumeration {
       isBounded = false)
   }
 
-  def deriveSumAndCountFromAvg(avgAggFunction: UserDefinedFunction
-                              ): (Sum0AggFunction, CountAggFunction) = {
+  def deriveSumAndCountFromAvg(
+      avgAggFunction: AvgAggFunction): (Sum0AggFunction, CountAggFunction) = {
     avgAggFunction match {
       case _: ByteAvgAggFunction => (new ByteSum0AggFunction, new CountAggFunction)
       case _: ShortAvgAggFunction => (new ShortSum0AggFunction, new CountAggFunction)
